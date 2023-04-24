@@ -1,7 +1,10 @@
 package co.edu.umanizales.tads.model;
 
+import co.edu.umanizales.tads.controller.dto.ReportDTO;
+import co.edu.umanizales.tads.services.LocationService;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -67,7 +70,7 @@ public class ListSE {
     public void DeleteKidByIdentification(String identification) {
         Node temp = head;
         Node Nodeanterior = null;
-        while ((temp != null) && (temp.getData().getIndentification() != identification)) {
+        while ((temp != null) && (temp.getData().getIdentification() != identification)) {
             Nodeanterior = temp;
             temp= temp.getNext();
         }
@@ -92,7 +95,7 @@ public class ListSE {
         }
     }
 
-    public  void SendKidFinalByLetter(char le){
+    public  void sendKidFinalByLetter(char le){
         char Ini;
         char let;
         if (this.head != null){
@@ -111,6 +114,23 @@ public class ListSE {
             this.head = copyList.getHead();
         }
     }
+
+    public void orderKidsToStart() {
+        if (this.head != null) {
+            ListSE listSE = new ListSE();
+            Node temp = this.head;
+            while (temp != null) {
+                if (temp.getData().getGender() == 'M') {
+                    listSE.addToStart(temp.getData());
+                }else {
+                    listSE.add(temp.getData());
+                }
+                temp = temp.getNext();
+            }
+            this.head = listSE.getHead();
+        }
+    }
+
 
     public void changeExtremes(){
         if(this.head !=null && this.head.getNext() !=null)
@@ -132,7 +152,7 @@ public class ListSE {
         if( this.head!=null){
             Node temp = this.head;
             while(temp != null){
-                if(temp.getData().getLocation().getCode().equals(code)){
+                if(temp.getData().getLocation().getCode().substring(0,8).equals(code)){
                     count++;
                 }
                 temp = temp.getNext();
@@ -141,10 +161,36 @@ public class ListSE {
         return count;
     }
 
-    public Kid getKidByIdentification(String ide){
-        for (Kid kid:kids){
-            if (kid.getIndentification().equals(ide)){
-                return kid;
+    public int getCountKidsByDeptCode(String code){
+        int count =0;
+        if( this.head!=null){
+            Node temp = this.head;
+            while(temp != null){
+                if(temp.getData().getLocation().getCode().substring(0,5).equals(code)){
+                    count++;
+                }
+                temp = temp.getNext();
+            }
+        }
+        return count;
+    }
+
+    public ReportDTO getReport(int age) {
+        int i = 0;
+        List<Location> list = new ArrayList<>();
+        //List<ReportDTO> reportList = new ArrayList<>();
+        while (this.head != null) {
+            Node temp = this.head;
+            if (temp.getData().getAge() > age) {
+                list.add(temp.getData().getLocation());
+
+                //list.get(i)         //Quisiera acceder a ese indice del arreglo pero no se como hacerlo
+                                      // para poder agregar un valor el cual me de la cantidad de niños que se encuentran
+                i++;
+                temp.getNext();
+            }
+            else {
+                temp.getNext();
             }
         }
         return null;

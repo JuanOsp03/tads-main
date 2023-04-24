@@ -23,13 +23,11 @@ public class LocationController {
 
     @GetMapping(path = "/countries")
     public ResponseEntity<ResponseDTO> getCountries(){
-        return new ResponseEntity<ResponseDTO>(new ResponseDTO(200,
-                locationService.getLocationByCodeSize(3),null), HttpStatus.OK);
+        return new ResponseEntity<ResponseDTO>(new ResponseDTO(200, locationService.getLocationByCodeSize(3),null), HttpStatus.OK);
     }
 
     @GetMapping(path = "/departments")
     public ResponseEntity<ResponseDTO> getDepartments(){
-        return new ResponseEntity<ResponseDTO>(new ResponseDTO(200,
-                locationService.getLocationByCodeSize(5),null), HttpStatus.OK);
+        return new ResponseEntity<ResponseDTO>(new ResponseDTO(200, locationService.getLocationByCodeSize(5),null), HttpStatus.OK);
     }
 }

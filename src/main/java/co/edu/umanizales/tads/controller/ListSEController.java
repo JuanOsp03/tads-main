@@ -29,15 +29,9 @@ public class ListSEController {
 
     @PostMapping
     public ResponseEntity<ResponseDTO> addKid(@RequestBody KidDTO kidDTO) {
-        Kid kidExisting = listaSEService.getKids().getKidByIdentification(kidDTO.getIdentification());
-        if (kidExisting != null){
-            return new ResponseEntity<>(new ResponseDTO(409,"Ya existe un niño con la misma identificacion",null), HttpStatus.CONFLICT);
-        }
         Location location = locationService.getLocationByCode(kidDTO.getCodeLocation());
         if(location == null){
-            return new ResponseEntity<>(new ResponseDTO(
-                    404,"La ubicación no existe",
-                    null), HttpStatus.OK);
+            return new ResponseEntity<>(new ResponseDTO(404,"La ubicación no existe", null), HttpStatus.OK);
         }
         listaSEService.getKids().add(new Kid(kidDTO.getIdentification(), kidDTO.getName(), kidDTO.getAge(),
                         kidDTO.getGender(), location));
@@ -47,7 +41,7 @@ public class ListSEController {
 
 //-------------------- PROTOTIPOS DE METODOS DE EXAMEN EN EL CONTROLLER DE LA ListSE //
 
-    @GetMapping(path = "/invertir_list")
+    @GetMapping(path = "/invert_list")
     public ResponseEntity<ResponseDTO> invert() {
         if (listaSEService.getKids() != null) {
             listaSEService.invert();
@@ -58,14 +52,20 @@ public class ListSEController {
         }
     }
 
-    @GetMapping(path = "/sendKidFinal/{code}")
-    public ResponseEntity<ResponseDTO> SendKidFinalByLetter(@PathVariable char code){  // <-------Este metodo, no me funciona
+    @GetMapping(path = "/send_kid_end/{code}")
+    public ResponseEntity<ResponseDTO> sendKidFinalByLetter(@PathVariable char code){  // <-------Este metodo, no me funciona
         if (listaSEService.getKids() != null) {
-            listaSEService.getKids().SendKidFinalByLetter(code);
+            listaSEService.getKids().sendKidFinalByLetter(code);
             return new ResponseEntity<>(new ResponseDTO(200,"La lista se ha organizado",null), HttpStatus.OK);
         }else {
             return new ResponseEntity<>(new ResponseDTO(409, "No existen niños, por lo tanto no se puede realizar la acción", null), HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @GetMapping(path = "/orderbystore")
+    public ResponseEntity<ResponseDTO> orderKidsToStart(){
+        listaSEService.getKids().orderKidsToStart();
+        return new ResponseEntity<>(new ResponseDTO(200,"La lista se ha ordenado con los niños al comienzo",null), HttpStatus.OK);
     }
 
     @GetMapping(path = "/change_extremes")
@@ -74,18 +74,41 @@ public class ListSEController {
         return new ResponseEntity<>(new ResponseDTO(200, "Se han intercambiado los extremos", null), HttpStatus.OK);
     }
 
-    @GetMapping(path = "/kidsbylocations")
-        public ResponseEntity<ResponseDTO> getKidsByLocation(){
-            List<KidsByLocationDTO> kidsByLocationDTOList = new ArrayList<>();
-            for(Location loc: locationService.getLocations()){
-                int count = listaSEService.getKids().getCountKidsByLocationCode(loc.getCode());
-                if(count>0){
-                    kidsByLocationDTOList.add(new KidsByLocationDTO(loc,count));
-                }
+    @GetMapping(path = "/kids_by_locations")
+    public ResponseEntity<ResponseDTO> getKidsByLocation(){
+        List<KidsByLocationDTO> kidsByLocationDTOList = new ArrayList<>();
+        for(Location loc: locationService.getLocations()){
+            int count = listaSEService.getKids().getCountKidsByLocationCode(loc.getCode());
+            if(count>0){
+                kidsByLocationDTOList.add(new KidsByLocationDTO(loc,count));
             }
-            return new ResponseEntity<>(new ResponseDTO(
-                    200,kidsByLocationDTOList,
-                    null), HttpStatus.OK);
         }
+        return new ResponseEntity<>(new ResponseDTO(
+                200,kidsByLocationDTOList,
+                null), HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/kids_by_depart")
+    public ResponseEntity<ResponseDTO> getKidsByDeptCode(){
+        List<KidsByLocationDTO> kidsByLocationDTOList1= new ArrayList<>();
+        for(Location loc: locationService.getLocations()){
+            int count = listaSEService.getKids().getCountKidsByDeptCode(loc.getCode());
+            if(count>0){
+                kidsByLocationDTOList1.add(new KidsByLocationDTO(loc,count));
+            }
+        }
+        return new ResponseEntity<>(new ResponseDTO(200,kidsByLocationDTOList1,
+                null), HttpStatus.OK);
+    }
+    //-------------------------------PROTOTIPO--------------------------------------------------
+    @GetMapping(path = "/kids_report")
+    public ResponseEntity<ResponseDTO> getReportKids(@PathVariable int age){
+        if (listaSEService.getKids() != null) {
+            listaSEService.getReport(age);
+            return new ResponseEntity<>(new ResponseDTO(200,"Se ha obtenido el reporte",null), HttpStatus.OK);
+        }else {
+            return new ResponseEntity<>(new ResponseDTO(409, "No existen niños, por lo tanto no se puede realizar la acción", null), HttpStatus.BAD_REQUEST);
+        }
+    }
 
 }//fin c_Controller

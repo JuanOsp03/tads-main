@@ -15,6 +15,8 @@ public class ListaSEService {
 
     public void invert(){ Kids.invert();}
 
+    public void getReport(int age){ Kids.getReport(age); }
+
     //public void changeExtremes(){ Kids.changeExtremes();}
 
     //public void sendKidFinal(char let){Kids.SendKidFinalByLetter(let);}
