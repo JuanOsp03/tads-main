@@ -24,22 +24,23 @@ public class LocationService {
         locations.add(new Location("16917003","Chinchina"));
     }
 
-    public List<Location> getLocationByCodeSize(int size){
-        List<Location> locationList = new ArrayList<>();
-        for (Location loc : locations){
-            if (loc.getCode().length()==size){
-                locationList.add(loc);
+    public List<Location> getLocationsByCodeSize(int size){
+        List<Location> listLocations = new ArrayList<>();
+        for(Location loc: locations){
+            if(loc.getCode().length()==size) {
+                listLocations.add(loc);
             }
         }
-        return locationList;
+        return listLocations;
     }
-    public Location getLocationByCode(String code){
 
-        for (Location loc : locations){
-            if (loc.getCode().equals(code));{
+    public Location getLocationByCode(String code){
+        for(Location loc: locations){
+            if(loc.getCode().equals(code)) {
                 return loc;
             }
         }
         return null;
     }
+
 }

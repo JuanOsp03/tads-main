@@ -1,24 +1,29 @@
 package co.edu.umanizales.tads.model;
 
-import co.edu.umanizales.tads.controller.dto.ReportDTO;
-import co.edu.umanizales.tads.services.LocationService;
+import co.edu.umanizales.tads.controller.dto.ReportKidsLocationGenderDTO;
+import co.edu.umanizales.tads.exception.ListSEException;
 import lombok.Data;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Data
 public class ListSE {
     private Node head;
+    private int size;
 
-    List<Kid> kids;
+    //List<Kid> kids;
 
-    public void add(Kid kid){
+    public void add(Kid kid) throws ListSEException {
         if(head != null){
             Node temp = head;
             while(temp.getNext() !=null)
             {
+                if(temp.getData().getIdentification().equals(kid.getIdentification())){
+                    throw new ListSEException("Ya existe un niño");
+                }
                 temp = temp.getNext();
+
+            }
+            if(temp.getData().getIdentification().equals(kid.getIdentification())){
+                throw new ListSEException("Ya existe un niño");
             }
             /// Parado en el último
             Node newNode = new Node(kid);
@@ -27,7 +32,9 @@ public class ListSE {
         else {
             head = new Node(kid);
         }
+        size ++;
     }
+
     public void addToStart(Kid kid){
         if(head !=null)
         {
@@ -38,35 +45,9 @@ public class ListSE {
         else {
             head = new Node(kid);
         }
+        size++;
     }
 
-    public int size() {
-        int sizeList = 0;
-        Node temp = head;
-        while (temp != null) {
-            temp = temp.getNext();
-            sizeList++;
-        }
-        return sizeList;
-    }
-    public Node addKidPos(int pos, Kid kid) {
-        if (size() >= pos) {
-            if (pos == 0) {
-                addToStart(kid);
-            } else {
-                Node temp = head;
-                for (int i = 0; i < pos - 1; i++) {
-                    temp = temp.getNext();
-                }
-                Node newNode = new Node(kid);
-                newNode.setNext(temp.getNext());
-                temp.setNext(newNode);
-            }
-        } else {
-            add(kid);
-        }
-        return null;
-    }
     public void DeleteKidByIdentification(String identification) {
         Node temp = head;
         Node Nodeanterior = null;
@@ -83,54 +64,37 @@ public class ListSE {
             }
         }
     }
+
     public void invert(){
-        if (this.head != null){
-            ListSE copiaList = new ListSE();
-            Node temporal = this.head;
-            while(temporal != null){
-                copiaList.addToStart(temporal.getData());
-                temporal = temporal.getNext();
-            }
-            this.head = copiaList.getHead();
-        }
-    }
-
-    public  void sendKidFinalByLetter(char le){
-        char Ini;
-        char let;
-        if (this.head != null){
-            ListSE copyList = new ListSE();
-            Node temporal = this.head;
-            while (temporal != null){
-                Ini = temporal.getData().getName().toLowerCase().charAt(0);
-                let = Character.toLowerCase(le);
-                if(Ini==let){
-                    copyList.add(temporal.getData());
-                }else{
-                    copyList.addToStart(temporal.getData());
-                }
-                temporal.getNext();
-            }
-            this.head = copyList.getHead();
-        }
-    }
-
-    public void orderKidsToStart() {
-        if (this.head != null) {
-            ListSE listSE = new ListSE();
+        if(this.head !=null){
+            ListSE listCp = new ListSE();
             Node temp = this.head;
-            while (temp != null) {
-                if (temp.getData().getGender() == 'M') {
-                    listSE.addToStart(temp.getData());
-                }else {
-                    listSE.add(temp.getData());
-                }
+            while(temp != null){
+                listCp.addToStart(temp.getData());
                 temp = temp.getNext();
             }
-            this.head = listSE.getHead();
+            this.head = listCp.getHead();
         }
     }
 
+    public void orderBoysToStart() throws ListSEException{
+        if(this.head !=null){
+            ListSE listCp = new ListSE();
+            Node temp = this.head;
+            while(temp != null){
+                if(temp.getData().getGender()=='M')
+                {
+                    listCp.addToStart(temp.getData());
+                }
+                else{
+                    listCp.add(temp.getData());
+                }
+
+                temp = temp.getNext();
+            }
+            this.head = listCp.getHead();
+        }
+    }
 
     public void changeExtremes(){
         if(this.head !=null && this.head.getNext() !=null)
@@ -145,6 +109,7 @@ public class ListSE {
             this.head.setData(temp.getData());
             temp.setData(copy);
         }
+
     }
 
     public int getCountKidsByLocationCode(String code){
@@ -152,7 +117,7 @@ public class ListSE {
         if( this.head!=null){
             Node temp = this.head;
             while(temp != null){
-                if(temp.getData().getLocation().getCode().substring(0,8).equals(code)){
+                if(temp.getData().getLocation().getCode().equals(code)){
                     count++;
                 }
                 temp = temp.getNext();
@@ -175,25 +140,56 @@ public class ListSE {
         return count;
     }
 
-    public ReportDTO getReport(int age) {
-        int i = 0;
-        List<Location> list = new ArrayList<>();
-        //List<ReportDTO> reportList = new ArrayList<>();
-        while (this.head != null) {
+    public void getReportKidsByLocationGendersByAge(byte age, ReportKidsLocationGenderDTO report){
+        if(head !=null){
             Node temp = this.head;
-            if (temp.getData().getAge() > age) {
-                list.add(temp.getData().getLocation());
+            while(temp!=null){
+                if(temp.getData().getAge()>age){
+                    report.updateQuantity(temp.getData().getLocation().getName(), temp.getData().getGender());
+                }
+                temp = temp.getNext();
+            }
+        }
+    }
 
-                //list.get(i)         //Quisiera acceder a ese indice del arreglo pero no se como hacerlo
-                                      // para poder agregar un valor el cual me de la cantidad de niños que se encuentran
-                i++;
-                temp.getNext();
+    /*
+    public  void sendKidFinalByLetter(char le){
+        char Ini;
+        char let;
+        if (this.head != null){
+            ListSE copyList = new ListSE();
+            Node temporal = this.head;
+            while (temporal != null){
+                Ini = temporal.getData().getName().toLowerCase().charAt(0);
+                let = Character.toLowerCase(le);
+                if(Ini==let){
+                    copyList.add(temporal.getData());
+                }else{
+                    copyList.addToStart(temporal.getData());
+                }
+                temporal.getNext();
             }
-            else {
-                temp.getNext();
+            this.head = copyList.getHead();
+        }
+    }
+
+    public Node addKidPos(int pos, Kid kid) {
+        if (size >= pos) {
+            if (pos == 0) {
+                addToStart(kid);
+            } else {
+                Node temp = head;
+                for (int i = 0; i < pos - 1; i++) {
+                    temp = temp.getNext();
+                }
+                Node newNode = new Node(kid);
+                newNode.setNext(temp.getNext());
+                temp.setNext(newNode);
             }
+        } else {
+            add(kid);
         }
         return null;
     }
-
+     */
 } // fin clase

@@ -17,17 +17,17 @@ public class LocationController {
     private LocationService locationService;
 
     @GetMapping
-    public ResponseEntity<ResponseDTO> getAllLocation(){
-        return new ResponseEntity<ResponseDTO>(new ResponseDTO(200,locationService.getLocations(),null), HttpStatus.OK);
+    public ResponseEntity<ResponseDTO> getAllLocations(){
+        return new ResponseEntity<ResponseDTO>(new ResponseDTO(200, locationService.getLocations(),null), HttpStatus.OK);
     }
 
     @GetMapping(path = "/countries")
     public ResponseEntity<ResponseDTO> getCountries(){
-        return new ResponseEntity<ResponseDTO>(new ResponseDTO(200, locationService.getLocationByCodeSize(3),null), HttpStatus.OK);
+        return new ResponseEntity<ResponseDTO>(new ResponseDTO(200, locationService.getLocationsByCodeSize(3),null), HttpStatus.OK);
     }
 
     @GetMapping(path = "/departments")
     public ResponseEntity<ResponseDTO> getDepartments(){
-        return new ResponseEntity<ResponseDTO>(new ResponseDTO(200, locationService.getLocationByCodeSize(5),null), HttpStatus.OK);
+        return new ResponseEntity<ResponseDTO>(new ResponseDTO(200, locationService.getLocationsByCodeSize(5),null), HttpStatus.OK);
     }
 }
