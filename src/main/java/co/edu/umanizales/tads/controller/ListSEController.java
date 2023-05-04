@@ -1,21 +1,20 @@
 package co.edu.umanizales.tads.controller;
 
-import co.edu.umanizales.tads.controller.dto.KidDTO;
-import co.edu.umanizales.tads.controller.dto.KidsByLocationDTO;
-import co.edu.umanizales.tads.controller.dto.ReportKidsLocationGenderDTO;
-import co.edu.umanizales.tads.controller.dto.ResponseDTO;
+import co.edu.umanizales.tads.controller.dto.*;
 import co.edu.umanizales.tads.exception.ListSEException;
 import co.edu.umanizales.tads.model.Kid;
 import co.edu.umanizales.tads.model.Location;
+import co.edu.umanizales.tads.model.Ranges;
 import co.edu.umanizales.tads.services.ListaSEService;
 import co.edu.umanizales.tads.services.LocationService;
+import co.edu.umanizales.tads.services.RangeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.ArrayList;
 import java.util.List;
-
 
 @RestController
 @RequestMapping(path = "/listse")
@@ -26,13 +25,18 @@ public class ListSEController {
     @Autowired
     private LocationService locationService;
 
+    @Autowired
+    private RangeService rangeService;
+
     @GetMapping
     public ResponseEntity<ResponseDTO> getKids(){
-            return new ResponseEntity<>(new ResponseDTO(200,listaSEService.getKids().getHead(),null), HttpStatus.OK); }
+            return new ResponseEntity<>(new ResponseDTO(200,listaSEService.getKids().getHead(),null), HttpStatus.OK);
+    }
 
     @PostMapping
     public ResponseEntity<ResponseDTO> addKid(@RequestBody KidDTO kidDTO){
         Location location = locationService.getLocationByCode(kidDTO.getCodeLocation());
+
         if(location == null){
             return new ResponseEntity<>(new ResponseDTO(404,"La ubicación no existe", null), HttpStatus.OK);
         }
@@ -40,75 +44,259 @@ public class ListSEController {
             listaSEService.getKids().add(new Kid(kidDTO.getIdentification(), kidDTO.getName(), kidDTO.getAge(), kidDTO.getGender(), location));
         } catch (ListSEException e) {
             return new ResponseEntity<>(new ResponseDTO(409,e.getMessage(), null), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseDTO(500, "Error interno del servidor", null), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+        return new ResponseEntity<>(new ResponseDTO(200,"Se ha adicionado correctamente el niño", null), HttpStatus.OK);
+    }
+
+    @GetMapping(path="/addposition")
+    public ResponseEntity<ResponseDTO> addByPosition(@PathVariable int position, @RequestBody Kid kid) throws ListSEException {
+        try {
+            listaSEService.getKids().addKidsByPosition(kid, position);
+            return new ResponseEntity<>(new ResponseDTO(200, "El niño fue añadido", null), HttpStatus.OK);
+        } catch (IndexOutOfBoundsException e) {
+            throw new ListSEException("La posición no existe en la lista");
+        } catch (NullPointerException e) {
+            throw new ListSEException("No se puede realizar la operación porque la lista esta vacia");
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseDTO(500, "Error interno del servidor", null), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(new ResponseDTO(200,"Se ha adicionado el petacón", null), HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/deletebyage/{age}")
+    public ResponseEntity<ResponseDTO> deleteByAge(@PathVariable byte age) throws ListSEException {
+        try {
+            if (listaSEService.getKids() != null) {
+                if (age < 0 || age > 14) {
+                    throw new ListSEException("La edad debe estar entre 0 y 14 años");
+                }
+                listaSEService.getKids().deleteKidByAge(age);
+                return new ResponseEntity<>(new ResponseDTO(200, "Niños por la edad dada eliminados", null), HttpStatus.OK);
+
+            } else {
+                return new ResponseEntity<>(new ResponseDTO(409, "No se puede realizar la acción", null), HttpStatus.BAD_REQUEST);
+            }
+        }catch (Exception e) {
+                return new ResponseEntity<>(new ResponseDTO(500, "Error interno del servidor", null), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping(path = "/invert_list")
-    public ResponseEntity<ResponseDTO> invert() {
-        if (listaSEService.getKids() != null) {
-            listaSEService.invert();
-            return new ResponseEntity<>(new ResponseDTO(200, "La lista se ha invertido", null), HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(new ResponseDTO(409, "No se puede realizar la acción", null),
-                    HttpStatus.BAD_REQUEST);
+    public ResponseEntity<ResponseDTO> invert() throws ListSEException {
+        try {
+            if (listaSEService.getKids() != null) {
+                listaSEService.invert();
+                return new ResponseEntity<>(new ResponseDTO(200, "La lista se ha invertido", null), HttpStatus.OK);
+
+            } else {
+                return new ResponseEntity<>(new ResponseDTO(409, "No se puede realizar la acción", null), HttpStatus.BAD_REQUEST);
+            }
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseDTO(500, "Error interno del servidor", null), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping(path = "/orderboystostart")
+    public ResponseEntity<ResponseDTO> orderBoysToStart() throws ListSEException {
+        try {
+            if (listaSEService.getKids() != null) {
+                listaSEService.getKids().orderBoysToStart();
+                return new ResponseEntity<>(new ResponseDTO(200, "Se ha ordenado la lista con los niños al comienzo", null), HttpStatus.OK);
+
+            } else {
+                return new ResponseEntity<>(new ResponseDTO(409, "No se puede realizar la acción", null), HttpStatus.BAD_REQUEST);
+            }
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseDTO(500, "Error interno del servidor", null), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping(path = "/alternatekids")
+    public ResponseEntity<ResponseDTO> alternateKids() throws ListSEException {
+        try {
+            if (listaSEService.getKids() != null) {
+                listaSEService.getKids().alternateKids();
+                return new ResponseEntity<>(new ResponseDTO(200, "Se ha alternado la lista con niño y niña", null), HttpStatus.OK);
+
+            } else {
+                return new ResponseEntity<>(new ResponseDTO(409, "No se puede realizar la acción", null), HttpStatus.BAD_REQUEST);
+            }
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseDTO(500, "Error interno del servidor", null), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping(path = "/deletekidbyage/{age}")
+    public ResponseEntity<ResponseDTO> deleteKidByAge(@PathVariable byte age) throws ListSEException{
+        try {
+            if (listaSEService.getKids() != null) {
+                listaSEService.getKids().deleteKidByAge(age);
+                return new ResponseEntity<>(new ResponseDTO(200, "Niños por la edad dada eliminados", null), HttpStatus.OK);
+
+            } else {
+                return new ResponseEntity<>(new ResponseDTO(409, "No se puede realizar la acción", null), HttpStatus.BAD_REQUEST);
+            }
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseDTO(500, "Error interno del servidor", null), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping(path="/averagekidsbyage")
+    public ResponseEntity<ResponseDTO> getAverageAge() throws ListSEException{
+        try {
+            if (listaSEService.getKids() != null) {
+                double averageAge = listaSEService.getKids().getAverageAge();
+                return new ResponseEntity<>(new ResponseDTO(
+                        200, "El promedio de la edad es aproximadamente: " + averageAge, null), HttpStatus.OK);
+
+            } else {
+                return new ResponseEntity<>(new ResponseDTO(409, "No se puede realizar la acción", null), HttpStatus.BAD_REQUEST);
+            }
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseDTO(500, "Error interno del servidor", null), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping(path = "/kidsbylocations")
+    public ResponseEntity<ResponseDTO> getReportKidsByLocation() throws ListSEException{
+        try {
+            List<KidsByLocationDTO> kidsByLocationDTOList = new ArrayList<>();
+
+            if (listaSEService.getKids() != null) {
+                for (Location loc : locationService.getLocations()) {
+                    int count = listaSEService.getKids().getCountKidsByLocationCode(loc.getCode());
+                    if (count > 0) {
+                        kidsByLocationDTOList.add(new KidsByLocationDTO(loc, count));
+                    }
+                }
+                return new ResponseEntity<>(new ResponseDTO(200, kidsByLocationDTOList, null), HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(new ResponseDTO(409, "No se puede realizar la acción", null), HttpStatus.BAD_REQUEST);
+            }
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseDTO(500, "Error interno del servidor", null), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping(path = "/kidsbylocationgenders/{age}")
+    public ResponseEntity<ResponseDTO> getReportKisLocationGenders(@PathVariable byte age) throws ListSEException{
+        try {
+            if (listaSEService.getKids() != null) {
+                ReportKidsLocationGenderDTO report = new ReportKidsLocationGenderDTO(locationService.getLocationsByCodeSize(8));
+                listaSEService.getKids().getReportKidsByLocationGendersByAge(age, report);
+                return new ResponseEntity<>(new ResponseDTO(200, report, null), HttpStatus.OK);
+
+            } else {
+                return new ResponseEntity<>(new ResponseDTO(409, "No se puede realizar la acción", null), HttpStatus.BAD_REQUEST);
+            }
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseDTO(500, "Error interno del servidor", null), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping(path = "/winpositionkid/{id}/{winPosition}")
+    public ResponseEntity<ResponseDTO> winPositionKid(@PathVariable String id, @PathVariable int winPosition) throws ListSEException{
+        try {
+            if (listaSEService.getKids() != null) {
+                listaSEService.getKids().winPositionKid(id, winPosition, listaSEService.getKids());
+                return new ResponseEntity<>(new ResponseDTO(200, "El niño se ha movido con éxito", null), HttpStatus.OK);
+
+            } else {
+                return new ResponseEntity<>(new ResponseDTO(409, "No se puede realizar la acción", null), HttpStatus.BAD_REQUEST);
+            }
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseDTO(500, "Error interno del servidor", null), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping(path = "/losepositionkid/{id}/{lostPosition}")
+    public ResponseEntity<ResponseDTO> losePositionKid(@PathVariable String id, @PathVariable int lostPosition) throws ListSEException{
+        try {
+            if (listaSEService.getKids() != null) {
+                listaSEService.getKids().lostPositionKid(id, lostPosition, listaSEService.getKids());
+                return new ResponseEntity<>(new ResponseDTO(200, "El niño se ha movido con éxito", null), HttpStatus.OK);
+
+            } else {
+                return new ResponseEntity<>(new ResponseDTO(409, "No se puede realizar la acción", null), HttpStatus.BAD_REQUEST);
+            }
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseDTO(500, "Error interno del servidor", null), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+   @GetMapping(path = "/reportkidsbyrange_age")
+    public ResponseEntity<ResponseDTO> getReportKidsByRangeByAge() throws ListSEException{
+        try {
+            List<RangeDTO> kidsRangeList = new ArrayList<>();
+
+            if (listaSEService.getKids() != null) {
+                for (Ranges i : rangeService.getRanges()) {
+                    int quantity = listaSEService.getKids().getReportByRangeAge(i.getFrom(), i.getTo());
+                    kidsRangeList.add(new RangeDTO(i,quantity));
+                }
+                return new ResponseEntity<>(new ResponseDTO(200, "el rango de los niños es: " + kidsRangeList, null), HttpStatus.OK);
+
+            } else {
+                return new ResponseEntity<>(new ResponseDTO(409, "No se puede realizar la acción", null), HttpStatus.BAD_REQUEST);
+            }
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseDTO(500, "Error interno del servidor", null), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+     }
+
+    @GetMapping(path = "/sendkidfinalbyletter/{initial}")
+    public ResponseEntity<ResponseDTO> sendKidFinalByLetter(@PathVariable char initial) throws ListSEException{
+        try {
+            if (listaSEService.getKids() != null) {
+                listaSEService.getKids().sendKidToTheEndByLetter(initial);
+                return new ResponseEntity<>(new ResponseDTO(200,
+                        "SE HAN ENVIADO LOS NIÑOS CON ESTA INICIAL AL FINAL", null), HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(new ResponseDTO(409, "No se puede realizar la acción", null), HttpStatus.BAD_REQUEST);
+            }
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseDTO(500, "Error interno del servidor", null), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @GetMapping(path = "/change_extremes")
-    public ResponseEntity<ResponseDTO> changeExtreme() {
-        listaSEService.getKids().changeExtremes();
-        return new ResponseEntity<>(new ResponseDTO(200, "Se han intercambiado los extremos", null), HttpStatus.OK);
-    }
+    public ResponseEntity<ResponseDTO> changeExtreme() throws ListSEException{
+        try {
+            if (listaSEService.getKids() != null) {
+                listaSEService.getKids().changeExtremes();
+                return new ResponseEntity<>(new ResponseDTO(200, "Se han intercambiado los extremos", null), HttpStatus.OK);
 
-    @GetMapping(path = "/kidsbylocations")
-    public ResponseEntity<ResponseDTO> getKidsByLocation(){
-        List<KidsByLocationDTO> kidsByLocationDTOList = new ArrayList<>();
-        for(Location loc: locationService.getLocations()){
-            int count = listaSEService.getKids().getCountKidsByLocationCode(loc.getCode());
-            if(count>0){
-                kidsByLocationDTOList.add(new KidsByLocationDTO(loc,count));
+            } else {
+                return new ResponseEntity<>(new ResponseDTO(409, "No se puede realizar la acción", null), HttpStatus.BAD_REQUEST);
             }
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseDTO(500, "Error interno del servidor", null), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(new ResponseDTO(200,kidsByLocationDTOList, null), HttpStatus.OK);
     }
 
     @GetMapping(path = "/kids_by_depart")
-    public ResponseEntity<ResponseDTO> getKidsByDeptCode() {
-        List<KidsByLocationDTO> kidsByLocationDTOList1 = new ArrayList<>();
-        for (Location loc : locationService.getLocations()) {
-            int count = listaSEService.getKids().getCountKidsByDeptCode(loc.getCode());
-            if (count > 0) {
-                kidsByLocationDTOList1.add(new KidsByLocationDTO(loc, count));
+    public ResponseEntity<ResponseDTO> getKidsByDeptCode() throws ListSEException{
+        try {
+            List<KidsByLocationDTO> kidsByLocationDTOList1 = new ArrayList<>();
+
+            if (listaSEService.getKids() != null) {
+                for (Location loc : locationService.getLocations()) {
+                    int count = listaSEService.getKids().getCountKidsByDeptCode(loc.getCode());
+                    if (count > 0) {
+                        kidsByLocationDTOList1.add(new KidsByLocationDTO(loc, count));
+                    }
+                }
+                return new ResponseEntity<>(new ResponseDTO(200, kidsByLocationDTOList1,
+                        null), HttpStatus.OK);
+
+            } else {
+                return new ResponseEntity<>(new ResponseDTO(409, "No se puede realizar la acción", null), HttpStatus.BAD_REQUEST);
             }
-        }
-        return new ResponseEntity<>(new ResponseDTO(200, kidsByLocationDTOList1,
-                null), HttpStatus.OK);
-    }
-
-    @GetMapping(path = "/kidsbylocationgenders/{age}")
-    public ResponseEntity<ResponseDTO> getReportKisLocationGenders(@PathVariable byte age) {
-        ReportKidsLocationGenderDTO report = new ReportKidsLocationGenderDTO(locationService.getLocationsByCodeSize(8));
-        listaSEService.getKids().getReportKidsByLocationGendersByAge(age,report);
-        return new ResponseEntity<>(new ResponseDTO(200,report, null), HttpStatus.OK);
-    }
-
-    /*
-    @GetMapping(path = "/send_kid_end/{code}")
-    public ResponseEntity<ResponseDTO> sendKidFinalByLetter(@PathVariable char code){  // <-------Este metodo, no me funciona
-        if (listaSEService.getKids() != null) {
-            listaSEService.getKids().sendKidFinalByLetter(code);
-            return new ResponseEntity<>(new ResponseDTO(200,"La lista se ha organizado",null), HttpStatus.OK);
-        }else {
-            return new ResponseEntity<>(new ResponseDTO(409, "No existen niños, por lo tanto no se puede realizar la acción", null), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseDTO(500, "Error interno del servidor", null), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-    @GetMapping(path = "/orderbystore")
-    public ResponseEntity<ResponseDTO> orderKidsToStart(){
-        listaSEService.getKids().orderKidsToStart();
-        return new ResponseEntity<>(new ResponseDTO(200,"La lista se ha ordenado con los niños al comienzo",null), HttpStatus.OK);
-    }
-*/
 
 }//fin c_Controller
