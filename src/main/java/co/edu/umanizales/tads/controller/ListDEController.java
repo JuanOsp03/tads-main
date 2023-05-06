@@ -36,7 +36,7 @@ public class ListDEController {
         return new ResponseEntity<>(new ResponseDTO(200, listDEService.getPets().printPets() , null), HttpStatus.OK);
     }
 
-    @PostMapping(path = "/add_pet")
+    @PostMapping
     public ResponseEntity<ResponseDTO> addPet(@RequestBody PetDTO petDTO) throws ListDEException {
         try {
             Location location = locationService.getLocationByCode(petDTO.getCodeLocation());
@@ -48,20 +48,7 @@ public class ListDEController {
             listDEService.getPets().addPet(newPet);
             return new ResponseEntity<>(new ResponseDTO(200, "Se ha adicionado a la mascota", null), HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(new ResponseDTO(404, e.getMessage(), null), HttpStatus.OK);
-        }
-    }
-
-    @GetMapping(path = "/add_pet_to_start")
-    public ResponseEntity<ResponseDTO> addPetToStart(@RequestBody Pet pet) throws ListDEException {
-        try {
-            listDEService.getPets().addPetToStart(pet);
-            return new ResponseEntity<>(new ResponseDTO(
-                    200, "La mascota fue añadida al inicio", null), HttpStatus.OK);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(new ResponseDTO(400, e.getMessage(), null), HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(new ResponseDTO(500, "Se ha producido un error al añadir la mascota al inicio", null), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(new ResponseDTO(404, "La ubicacion no existe", null), HttpStatus.OK);
         }
     }
 
@@ -95,8 +82,8 @@ public class ListDEController {
         }
     }
 
-    @GetMapping(path = "/pets_to_start")
-    public ResponseEntity<ResponseDTO> addPetsToStart() {
+    @GetMapping(path = "/order_pets_to_start")
+    public ResponseEntity<ResponseDTO> orderPetsToStart() {
         try {
             listDEService.getPets().addPetsToStart();
         } catch (Exception e) {
