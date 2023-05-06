@@ -148,7 +148,6 @@ public class ListSE {
                     temp = temp.getNext();
                 }
                 this.head = listcopy.getHead();
-
             }
         }
     }
@@ -169,6 +168,38 @@ public class ListSE {
         }
     }
 
+    public int getReportKidsByLocationCode(String code) throws ListSEException{
+        int count =0;
+        if(this.head!=null){
+            Node temp = this.head;
+            while(temp != null){
+                if(temp.getData().getLocation().getCode().equals(code)){
+                    count++;
+                }
+                temp = temp.getNext();
+            }
+        }else {
+            throw new ListSEException("No existen niños para poder realizar la operación");
+        }
+        return count;
+    }
+
+    public int getReportKidsByDeptCode(String code) throws ListSEException{
+        int count =0;
+        if(this.head!=null){
+            Node temp = this.head;
+            while(temp != null){
+                if(temp.getData().getLocation().getCode().substring(0,5).equals(code)){
+                    count++;
+                }
+                temp = temp.getNext();
+            }
+        }else {
+            throw new ListSEException("No existen niños para poder realizar la operación");
+        }
+        return count;
+    }
+
     public void getReportKidsByLocationGendersByAge(byte age, ReportKidsLocationGenderDTO report) throws ListSEException {
         if (head != null) {
             Node temp = this.head;
@@ -180,21 +211,6 @@ public class ListSE {
             }
         } else {
             throw new ListSEException("No existen niños para poder realizar la función");
-        }
-    }
-
-    public void addKidsByPosition(Kid kid, int pos) {
-        Node newNode = new Node(kid);
-        if (pos == 0) {
-            newNode.setNext(head);
-            head = newNode;
-        } else {
-            Node current = head;
-            for (int i = 1; i < pos - 1; i++) {
-                current = current.getNext();
-            }
-            newNode.setNext(current.getNext());
-            current.setNext(newNode);
         }
     }
 
@@ -210,10 +226,6 @@ public class ListSE {
             while (temp != null && !temp.getData().getIdentification().equals(id)) {
                 temp = temp.getNext();
                 count++;
-            }
-
-            if (count > size || count < size) {
-                throw new ListSEException("No se puede realizar la accion por falta de niños");
             }
 
             int newPosition = count - position;
@@ -271,7 +283,7 @@ public class ListSE {
         } else {
             while (temp != null) {
                 if (temp.getData().getName().charAt(0) != Character.toUpperCase(letter)) {
-                    listCopy.add(temp.getData());
+                    listCopy.addToStart(temp.getData());
                 }
             }
             temp = temp.getNext();
@@ -292,7 +304,6 @@ public class ListSE {
         this.head = listCopy.getHead();
     }
 
-    
     public void changeExtremes() throws ListSEException{
         if(this.head !=null && this.head.getNext() !=null) {
             Node temp = this.head;
@@ -309,35 +320,23 @@ public class ListSE {
         }
     }
 
-    public int getCountKidsByLocationCode(String code) throws ListSEException{
-        int count =0;
-        if(this.head!=null){
-            Node temp = this.head;
-            while(temp != null){
-                if(temp.getData().getLocation().getCode().equals(code)){
-                    count++;
+    public void addKidsByPosition(Kid kid, int pos) throws ListSEException{
+        if (head != null) {
+            Node newNode = new Node(kid);
+            if (pos == 0) {
+                newNode.setNext(head);
+                head = newNode;
+            } else {
+                Node current = head;
+                for (int i = 1; i < pos - 1; i++) {
+                    current = current.getNext();
                 }
-                temp = temp.getNext();
+                newNode.setNext(current.getNext());
+                current.setNext(newNode);
             }
-        }else {
-            throw new ListSEException("No existen niños para poder realizar la operación");
-        }
-        return count;
-    }
 
-    public int getCountKidsByDeptCode(String code) throws ListSEException{
-        int count =0;
-        if(this.head!=null){
-            Node temp = this.head;
-            while(temp != null){
-                if(temp.getData().getLocation().getCode().substring(0,5).equals(code)){
-                    count++;
-                }
-                temp = temp.getNext();
-            }
-        }else {
-            throw new ListSEException("No existen niños para poder realizar la operación");
+        } else {
+            throw new ListSEException("No existen niños para poder realizar la función");
         }
-        return count;
     }
 } // fin class

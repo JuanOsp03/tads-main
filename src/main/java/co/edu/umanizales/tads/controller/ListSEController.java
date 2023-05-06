@@ -51,6 +51,7 @@ public class ListSEController {
         return new ResponseEntity<>(new ResponseDTO(200,"Se ha adicionado correctamente el niño", null), HttpStatus.OK);
     }
 
+    /*
     @GetMapping(path="/addposition")
     public ResponseEntity<ResponseDTO> addByPosition(@PathVariable int position, @RequestBody Kid kid) throws ListSEException {
         try {
@@ -64,24 +65,7 @@ public class ListSEController {
             return new ResponseEntity<>(new ResponseDTO(500, "Error interno del servidor", null), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-    @GetMapping(path = "/deletebyage/{age}")
-    public ResponseEntity<ResponseDTO> deleteByAge(@PathVariable byte age) throws ListSEException {
-        try {
-            if (listaSEService.getKids() != null) {
-                if (age < 0 || age > 14) {
-                    throw new ListSEException("La edad debe estar entre 0 y 14 años");
-                }
-                listaSEService.getKids().deleteKidByAge(age);
-                return new ResponseEntity<>(new ResponseDTO(200, "Niños por la edad dada eliminados", null), HttpStatus.OK);
-
-            } else {
-                return new ResponseEntity<>(new ResponseDTO(409, "No se puede realizar la acción", null), HttpStatus.BAD_REQUEST);
-            }
-        }catch (Exception e) {
-                return new ResponseEntity<>(new ResponseDTO(500, "Error interno del servidor", null), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
+     */
 
     @GetMapping(path = "/invert_list")
     public ResponseEntity<ResponseDTO> invert() throws ListSEException {
@@ -114,11 +98,11 @@ public class ListSEController {
     }
 
     @GetMapping(path = "/alternatekids")
-    public ResponseEntity<ResponseDTO> alternateKids() throws ListSEException {
+    public ResponseEntity<ResponseDTO> generateAlternateKids() throws ListSEException {
         try {
             if (listaSEService.getKids() != null) {
                 listaSEService.getKids().alternateKids();
-                return new ResponseEntity<>(new ResponseDTO(200, "Se ha alternado la lista con niño y niña", null), HttpStatus.OK);
+                return new ResponseEntity<>(new ResponseDTO(200, "Se ha alternado la lista", null), HttpStatus.OK);
 
             } else {
                 return new ResponseEntity<>(new ResponseDTO(409, "No se puede realizar la acción", null), HttpStatus.BAD_REQUEST);
@@ -143,7 +127,7 @@ public class ListSEController {
         }
     }
 
-    @GetMapping(path="/averagekidsbyage")
+    @GetMapping(path="/average_kids_by_age")
     public ResponseEntity<ResponseDTO> getAverageAge() throws ListSEException{
         try {
             if (listaSEService.getKids() != null) {
@@ -166,7 +150,7 @@ public class ListSEController {
 
             if (listaSEService.getKids() != null) {
                 for (Location loc : locationService.getLocations()) {
-                    int count = listaSEService.getKids().getCountKidsByLocationCode(loc.getCode());
+                    int count = listaSEService.getKids().getReportKidsByDeptCode(loc.getCode());
                     if (count > 0) {
                         kidsByLocationDTOList.add(new KidsByLocationDTO(loc, count));
                     }
@@ -196,11 +180,11 @@ public class ListSEController {
         }
     }
 
-    @GetMapping(path = "/winpositionkid/{id}/{winPosition}")
-    public ResponseEntity<ResponseDTO> winPositionKid(@PathVariable String id, @PathVariable int winPosition) throws ListSEException{
+    @GetMapping(path = "/winpositionkid/{ide}/{winPosition}")
+    public ResponseEntity<ResponseDTO> winPositionKid(@PathVariable String ide, @PathVariable int winPosition) throws ListSEException{
         try {
             if (listaSEService.getKids() != null) {
-                listaSEService.getKids().winPositionKid(id, winPosition, listaSEService.getKids());
+                listaSEService.getKids().winPositionKid(ide, winPosition, listaSEService.getKids());
                 return new ResponseEntity<>(new ResponseDTO(200, "El niño se ha movido con éxito", null), HttpStatus.OK);
 
             } else {
@@ -227,7 +211,7 @@ public class ListSEController {
     }
 
    @GetMapping(path = "/reportkidsbyrange_age")
-    public ResponseEntity<ResponseDTO> getReportKidsByRangeByAge() throws ListSEException{
+    public ResponseEntity<ResponseDTO> getReportKidsRangeByAge() throws ListSEException{
         try {
             List<RangeDTO> kidsRangeList = new ArrayList<>();
 
@@ -278,12 +262,12 @@ public class ListSEController {
 
     @GetMapping(path = "/kids_by_depart")
     public ResponseEntity<ResponseDTO> getKidsByDeptCode() throws ListSEException{
-        try {
+        try{
             List<KidsByLocationDTO> kidsByLocationDTOList1 = new ArrayList<>();
 
             if (listaSEService.getKids() != null) {
                 for (Location loc : locationService.getLocations()) {
-                    int count = listaSEService.getKids().getCountKidsByDeptCode(loc.getCode());
+                    int count = listaSEService.getKids().getReportKidsByDeptCode(loc.getCode());
                     if (count > 0) {
                         kidsByLocationDTOList1.add(new KidsByLocationDTO(loc, count));
                     }
