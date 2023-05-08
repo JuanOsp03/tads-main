@@ -197,4 +197,10 @@ public class ListDEController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @GetMapping(path = "/delete_specific_pet_by_ide/{ide}")
+    public ResponseEntity<ResponseDTO> deleteSpecificPet(@PathVariable String ide) {
+        listDEService.getPets().deleteSpecificNodeDE(ide);
+        return new ResponseEntity<>(new ResponseDTO(200, "La mascota se elimino con exito", null), HttpStatus.OK);
+    }
 } // end class controller

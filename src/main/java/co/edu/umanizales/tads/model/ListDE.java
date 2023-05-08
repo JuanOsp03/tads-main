@@ -343,7 +343,55 @@ public class ListDE {
         this.headDE = listCopy.getHeadDE();
     }
 
+/* Metodo eliminar pero esta vez parado exactamente en el nodo (en este caso mascota).
 
+Primero debo de recibir como parametro la identificacion de la mascota el cual me identifique el nodo para borrarlo y empiezar a realizar el metodo.
 
+Lo que debo realizar primero son algunas condiciones las cuales serian si la lista tiene valores, es decir, que no sea null
+
+Despues lo que debo hacer es empezar a recorrer la lista por medio de un ayudante y lograr pararme en el nodo exactamente que deseo eliminar
+una vez parado en el nodo que deseo eliminar, tengo que hacer ciertas condiciones que serian:
+
+ 1- Si el "siguiente" del nodo es null, entonces debo eliminar y volver al nodo anterior como ultimo y definir que el siguiente del nodo anterior
+ al que voy a eliminar va a tener null.
+
+ Para eso, estando parado en el nodo que deseo eliminar, genero una vaiable temporal que va a ser igual al previous del nodo que voy a eliminar para asi
+ decirle a ese nodo que su "siguiente" va a ser null, y a la vez decirle al previous del nodo que voy a eliminar que va a ser null
+
+ 2- Si el previous del nodo que voy a eliminar es null, quiere decir que es la cabeza por lo tanto digo que la cabeza va a ser igual a cabeza.siguiente y pregunto
+ que si cabeza es diferente a null; si hay datos, digo que cabeza. previous va a ser igual a null
+
+ 3- Si el nodo que voy a eliminar es un nodo que esta en medio de dos nodos, entonces genero dos variables las cuales una de ellas va a ser
+ igual al nodo anterior del que deseo eliminar y el otro va a ser igual al nodo siguiente que deseo eliminar, para que a la vez que
+ elimino las conexiones que tiene el siguiente y el previous del nodo que voy a eliminar, actualizar las conexiones de los nodo vecinos
+
+ */
+    public void deleteSpecificNodeDE(String identification){
+        NodeDE temp = headDE;
+        NodeDE before , after;
+        while (this.headDE != null) {
+
+            if (this.headDE.getData().getIdentification().equals(identification)) {
+                this.headDE = headDE.getNextDE();
+                if (headDE != null) {
+                    headDE.setPreviousDE(null);
+                }
+            } else {
+                while (!temp.getData().getIdentification().equals(identification)) {
+                    temp = temp.getNextDE();
+                }
+                temp = temp.getNextDE();
+                if(temp.getNextDE() == null) {
+                    before = temp.getPreviousDE();
+                    before.setNextDE(null);
+                } else {
+                    before = temp.getPreviousDE();
+                    after = temp.getNextDE();
+                    before.setNextDE(after);
+                    after.setPreviousDE(before);
+                }
+            }
+        }
+    }
 
 } // end class ListDE
