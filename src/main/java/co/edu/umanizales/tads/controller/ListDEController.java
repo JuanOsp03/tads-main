@@ -200,7 +200,11 @@ public class ListDEController {
 
     @GetMapping(path = "/delete_specific_pet_by_ide/{ide}")
     public ResponseEntity<ResponseDTO> deleteSpecificPet(@PathVariable String ide) {
-        listDEService.getPets().deleteSpecificNodeDE(ide);
-        return new ResponseEntity<>(new ResponseDTO(200, "La mascota se elimino con exito", null), HttpStatus.OK);
+        if (listDEService.getPets().printPets() != null) {
+            listDEService.getPets().deleteSpecificNodeDE(ide);
+            return new ResponseEntity<>(new ResponseDTO(200, "La mascota se elimino con exito", null), HttpStatus.OK);
+        }else {
+            return new ResponseEntity<>(new ResponseDTO(400, "No se pudo realizar la operacion debido a que no existian mascotas", null), HttpStatus.BAD_REQUEST);
+        }
     }
 } // end class controller

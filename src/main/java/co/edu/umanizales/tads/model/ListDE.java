@@ -347,10 +347,10 @@ public class ListDE {
 
 Primero debo de recibir como parametro la identificacion de la mascota el cual me identifique el nodo para borrarlo y empiezar a realizar el metodo.
 
-Lo que debo realizar primero son algunas condiciones las cuales serian si la lista tiene valores, es decir, que no sea null
+Lo que debo realizar primero son validaciones las cuales serian si la lista tiene valores, es decir, que no sea null
 
 Despues lo que debo hacer es empezar a recorrer la lista por medio de un ayudante y lograr pararme en el nodo exactamente que deseo eliminar
-una vez parado en el nodo que deseo eliminar, tengo que hacer ciertas condiciones que serian:
+una vez parado en el nodo que deseo eliminar, tengo que realizar nuevas validaciones que serian:
 
  1- Si el "siguiente" del nodo es null, entonces debo eliminar y volver al nodo anterior como ultimo y definir que el siguiente del nodo anterior
  al que voy a eliminar va a tener null.
