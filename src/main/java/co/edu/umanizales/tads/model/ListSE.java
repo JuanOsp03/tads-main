@@ -259,7 +259,7 @@ public class ListSE {
 
     public int getReportByRangeAge(int letter, int last) throws ListSEException {
         Node temp = head;
-        int count = 1;
+        int count = 0;
 
         if (this.head == null) {
             throw new ListSEException("No existen niños para poder realizar la operación");

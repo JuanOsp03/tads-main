@@ -258,7 +258,7 @@ public class ListDE {
         }
         if (headDE != null) {
             NodeDE temp = headDE;
-            int count = 0;
+            int count = 1;
             while (temp != null && !temp.getData().getIdentification().equals(id)) {
                 temp = temp.getNextDE();
                 count++;
@@ -298,7 +298,7 @@ public class ListDE {
 
     public int getReportPetByRangeAge(int firstRange, int lastRange) throws ListDEException {
         NodeDE temp = headDE;
-        int count = 1;
+        int count = 0;
 
         if (this.headDE == null) {
             throw new ListDEException("No existen mascotas para poder realizar la operación");
