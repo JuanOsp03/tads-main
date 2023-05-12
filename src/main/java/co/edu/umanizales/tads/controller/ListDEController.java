@@ -41,10 +41,9 @@ public class ListDEController {
         try {
             Location location = locationService.getLocationByCode(petDTO.getCodeLocation());
             if (location == null){
-                throw new ListDEException("La ubicación no existe");
+                return new ResponseEntity<>(new ResponseDTO(404, "La ubicación no existe", null), HttpStatus.OK);
             }
             Pet newPet = new Pet(petDTO.getName(), petDTO.getAge(), petDTO.getIdentification(), petDTO.getPetType() ,petDTO.getBreed(), petDTO.getGender() , location);
-
             listDEService.getPets().addPet(newPet);
             return new ResponseEntity<>(new ResponseDTO(200, "Se ha adicionado a la mascota", null), HttpStatus.OK);
         } catch (Exception e) {
@@ -122,10 +121,10 @@ public class ListDEController {
         }
     }
 
-    @GetMapping(path = "/win_position_pet/{code}/{move}")
-    public ResponseEntity<ResponseDTO> winPosition(@PathVariable String code, @PathVariable int move) {
+    @GetMapping(path = "/win_position_pet/{code}/{num}")
+    public ResponseEntity<ResponseDTO> winPosition(@PathVariable String code, @PathVariable int num) {
         try {
-            listDEService.getPets().winPosition(code,move);
+            listDEService.getPets().winPositionPet(code,num);
             return new ResponseEntity<>(new ResponseDTO(200, "Accion realizada con exito, se ha podido adelantar la posicion de la mascota", null), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(new ResponseDTO(500, "Se produjo un error al realizar la operacion", null), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -133,7 +132,7 @@ public class ListDEController {
     }
 
     @GetMapping(path = "/lost_position_pet/{code}/{position}")
-    public ResponseEntity<ResponseDTO> lostPositionPet(@PathVariable String code, @PathVariable int position) {
+    public ResponseEntity<ResponseDTO> losePosition(@PathVariable String code, @PathVariable int position) {
         try {
             listDEService.getPets().lostPositionPet(code,position);
             return new ResponseEntity<>(new ResponseDTO(200, "Accion realizada con exito, se ha podido perder la posicion de la mascota ", null), HttpStatus.OK);
@@ -145,12 +144,12 @@ public class ListDEController {
     @GetMapping(path = "/report_range_by_age")
     public ResponseEntity<ResponseDTO> getReportRangeByAgePets(){
         try {
-            List<RangeDTO> PetsRangeList = new ArrayList<>();
+            List<RangeDTO> petsRangeList = new ArrayList<>();
             for (Ranges i : rangeService.getRanges()){
                 int quantity = listDEService.getPets().getReportPetByRangeAge(i.getFrom(), i.getTo());
-                PetsRangeList.add(new RangeDTO(i,quantity));
+                petsRangeList.add(new RangeDTO(i,quantity));
             }
-            return new ResponseEntity<>(new ResponseDTO(200,"Accion realizada con exito, el rango de los niños es: "+PetsRangeList, null), HttpStatus.OK);
+            return new ResponseEntity<>(new ResponseDTO(200,"Accion realizada con exito, el rango de los niños es: "+ petsRangeList, null), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(new ResponseDTO(500,"Error al obtener el rango de edades", null), HttpStatus.INTERNAL_SERVER_ERROR);
         }

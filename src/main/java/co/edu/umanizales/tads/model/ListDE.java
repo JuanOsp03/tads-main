@@ -214,14 +214,17 @@ public class ListDE {
             if (count == 0) {
                 throw new ListDEException("La lista esta vacia, no se puede realizar la accion");
             }
-            return (double) ages / count;
+            return (float) ages / count;
         } else {
             throw new ListDEException("La lista esta vacia, no se puede realizar la accion");
         }
     }
 
-    public int getReportPetsByLocationCode(String code) throws ListSEException{
+    public int getReportPetsByLocationCode(String code) throws ListDEException{
         int count =0;
+        if (code == null || code.isEmpty()) {
+            throw new ListDEException("El codigo de la ciudad no puede estar vacio");
+        }
         if(this.headDE != null){
             NodeDE temp = this.headDE;
             while(temp != null){
@@ -230,13 +233,11 @@ public class ListDE {
                 }
                 temp = temp.getNextDE();
             }
-        }else {
-            throw new ListSEException("No existen mascotas para poder realizar la operación");
         }
         return count;
     }
 
-    public int getReportPetsByDeptCode(String code) throws ListSEException{
+    public int getReportPetsByDeptCode(String code) throws ListDEException{
         int count =0;
         if(this.headDE != null){
             NodeDE temp = this.headDE;
@@ -247,12 +248,12 @@ public class ListDE {
                 temp = temp.getNextDE();
             }
         }else {
-            throw new ListSEException("No existen mascotas para poder realizar la operación");
+            throw new ListDEException("No existen mascotas para poder realizar la operación");
         }
         return count;
     }
 
-    public void winPosition(String id, int position) throws ListDEException {
+    public void winPositionPet(String id, int position) throws ListDEException {
         if (position < 0) {
             throw new IllegalArgumentException("La posición debe ser un número positivo");
         }
@@ -299,7 +300,6 @@ public class ListDE {
     public int getReportPetByRangeAge(int firstRange, int lastRange) throws ListDEException {
         NodeDE temp = headDE;
         int count = 0;
-
         if (this.headDE == null) {
             throw new ListDEException("No existen mascotas para poder realizar la operación");
         } else {
@@ -314,33 +314,24 @@ public class ListDE {
     }
 
     public void sendPetToTheEndByLetter(char letter) throws ListDEException {
-        ListDE listCopy = new ListDE();
-        NodeDE temp = this.headDE;
+        if (this.headDE != null) {
+            ListDE listCopy = new ListDE();
+            NodeDE temp = this.headDE;
+            char firstChar = Character.toUpperCase(letter);
 
-        if (this.headDE == null) {
-            throw new ListDEException("No existen mascotas para poder realizar la operación");
-        } else {
             while (temp != null) {
-                if (temp.getData().getName().charAt(0) != Character.toUpperCase(letter)) {
+                char firstLetter = temp.getData().getName().charAt(0);
+                if (Character.toUpperCase(firstLetter) != firstChar) {
                     listCopy.addPetToStart(temp.getData());
-                }
-            }
-            temp = temp.getNextDE();
-        }
-
-        temp = this.headDE;
-
-        if (this.headDE == null) {
-            throw new ListDEException("No existen mascotas para poder realizar la operación");
-        } else {
-            while (temp != null) {
-                if (temp.getData().getName().charAt(0) == Character.toUpperCase(letter)) {
+                } else {
                     listCopy.addPet(temp.getData());
                 }
                 temp = temp.getNextDE();
             }
+            this.headDE = listCopy.getHeadDE();
+        } else {
+            throw new ListDEException("La lista no puede estar vacia");
         }
-        this.headDE = listCopy.getHeadDE();
     }
 
 /* Metodo eliminar pero esta vez parado exactamente en el nodo (en este caso mascota).
