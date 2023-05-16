@@ -10,7 +10,6 @@ import java.util.List;
 @Data
 public class ListDE {
     private NodeDE headDE;
-    private NodeDE tail;
     private int size;
     List<Pet> pets = new ArrayList<>();
 
@@ -184,9 +183,10 @@ public class ListDE {
             throw new IllegalArgumentException("La edad de la mascota no puede ser nula");
         }
         NodeDE temp = headDE;
+        NodeDE previo;
         while (temp != null) {
             if (temp.getData().getAge() == age) {
-                NodeDE previo = temp.getPreviousDE();
+                previo = temp.getPreviousDE();
                 NodeDE next = temp.getNextDE();
                 if (previo == null) {
                     headDE = next;
@@ -255,7 +255,7 @@ public class ListDE {
 
     public void winPositionPet(String id, int position) throws ListDEException {
         if (position < 0) {
-            throw new IllegalArgumentException("La posición debe ser un número positivo");
+            throw new ListDEException("La posición debe ser un número positivo");
         }
         if (headDE != null) {
             NodeDE temp = headDE;
@@ -360,8 +360,7 @@ una vez parado en el nodo que deseo eliminar, tengo que realizar nuevas validaci
     public void deleteSpecificNodeDE(String identification){
         NodeDE temp = headDE;
         NodeDE before , after;
-        while (this.headDE != null) {
-
+        if(this.headDE != null) {
             if (this.headDE.getData().getIdentification().equals(identification)) {
                 this.headDE = headDE.getNextDE();
                 if (headDE != null) {

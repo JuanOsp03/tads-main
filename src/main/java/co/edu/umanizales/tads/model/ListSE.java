@@ -46,11 +46,11 @@ public class ListSE {
     public void deleteKidByIdentification(String identification) {
         Node temp = head;
         Node Nodeanterior = null;
-        while ((temp != null) && (temp.getData().getIdentification() != identification)) {
-            Nodeanterior = temp;
-            temp = temp.getNext();
-        }
         if (temp != null) {
+            while (!temp.getData().getIdentification().equals(identification)) {
+                Nodeanterior = temp;
+                temp = temp.getNext();
+            }
             if (Nodeanterior == null) {
                 head = temp.getNext();
             } else {
@@ -76,7 +76,7 @@ public class ListSE {
     public void orderBoysToStart() throws ListSEException {
         if (this.head != null) {
             ListSE listCp = new ListSE();
-            Node temp = this.head;
+            Node temp = head;
 
             while (temp != null) {
                 if (temp.getData().getGender() == 'M') {
@@ -86,7 +86,7 @@ public class ListSE {
                 }
                 temp = temp.getNext();
             }
-            this.head = listCp.getHead();
+            head = listCp.getHead();
         } else {
             throw new ListSEException("No hay niños para completar esta operacion");
         }
@@ -215,13 +215,9 @@ public class ListSE {
     }
 
     public void winPositionKid(String id, int position, ListSE listSE) throws ListSEException {
-        if (!this.head.getData().getIdentification().equals(id)) {
-            throw new ListSEException("No existe el niño que busca");
-        }
-
         if (head != null) {
             Node temp = this.head;
-            int count = 0;
+            int count = 1;
 
             while (temp != null && !temp.getData().getIdentification().equals(id)) {
                 temp = temp.getNext();

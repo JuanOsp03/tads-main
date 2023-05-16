@@ -13,5 +13,6 @@ public class Pet {
     private String breed;  //(raza)
     private char gender;
     private Location location;
+    private boolean bathed; //(bañado)
 
 }

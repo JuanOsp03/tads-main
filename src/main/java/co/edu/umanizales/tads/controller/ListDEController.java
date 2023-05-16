@@ -43,7 +43,7 @@ public class ListDEController {
             if (location == null){
                 return new ResponseEntity<>(new ResponseDTO(404, "La ubicación no existe", null), HttpStatus.OK);
             }
-            Pet newPet = new Pet(petDTO.getName(), petDTO.getAge(), petDTO.getIdentification(), petDTO.getPetType() ,petDTO.getBreed(), petDTO.getGender() , location);
+            Pet newPet = new Pet(petDTO.getName(), petDTO.getAge(), petDTO.getIdentification(), petDTO.getPetType() ,petDTO.getBreed(), petDTO.getGender() , location , false);
             listDEService.getPets().addPet(newPet);
             return new ResponseEntity<>(new ResponseDTO(200, "Se ha adicionado a la mascota", null), HttpStatus.OK);
         } catch (Exception e) {
@@ -111,10 +111,15 @@ public class ListDEController {
         }
     }
 
-    @GetMapping(path = "/add_pet_by_position/{position}")
-    public ResponseEntity<ResponseDTO> addPetByPosition(@RequestBody Pet pet, @PathVariable int position) {
+    @PostMapping(path = "/add_pet_by_position/{position}")
+    public ResponseEntity<ResponseDTO> addPetByPosition(@RequestBody PetDTO pet, @PathVariable int position) {
         try {
-            listDEService.getPets().addPetByPosition(pet,position);
+            Location location = locationService.getLocationByCode(pet.getCodeLocation());
+            if (location == null){
+                return new ResponseEntity<>(new ResponseDTO(404, "La ubicación no existe", null), HttpStatus.OK);
+            }
+            Pet newPet = new Pet(pet.getName(), pet.getAge(), pet.getIdentification(), pet.getPetType() ,pet.getBreed(), pet.getGender() , location , false);
+            listDEService.getPets().addPetByPosition(newPet,position);
             return new ResponseEntity<>(new ResponseDTO(200, "La mascota fue añadida en la posición solicitada", null), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(new ResponseDTO(500, "Se produjo un error al realizar la operacion", null), HttpStatus.INTERNAL_SERVER_ERROR);

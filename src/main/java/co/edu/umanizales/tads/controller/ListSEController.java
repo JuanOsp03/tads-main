@@ -51,21 +51,15 @@ public class ListSEController {
         return new ResponseEntity<>(new ResponseDTO(200,"Se ha adicionado correctamente el niño", null), HttpStatus.OK);
     }
 
-    /*
-    @GetMapping(path="/addposition")
+    @PostMapping(path="/add_position/{position}")
     public ResponseEntity<ResponseDTO> addByPosition(@PathVariable int position, @RequestBody Kid kid) throws ListSEException {
         try {
             listaSEService.getKids().addKidsByPosition(kid, position);
             return new ResponseEntity<>(new ResponseDTO(200, "El niño fue añadido", null), HttpStatus.OK);
-        } catch (IndexOutOfBoundsException e) {
-            throw new ListSEException("La posición no existe en la lista");
-        } catch (NullPointerException e) {
-            throw new ListSEException("No se puede realizar la operación porque la lista esta vacia");
         } catch (Exception e) {
-            return new ResponseEntity<>(new ResponseDTO(500, "Error interno del servidor", null), HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new ListSEException("No se puede realizar la operación");
         }
     }
-     */
 
     @GetMapping(path = "/invert_list")
     public ResponseEntity<ResponseDTO> invert() throws ListSEException {
@@ -180,16 +174,11 @@ public class ListSEController {
         }
     }
 
-    @GetMapping(path = "/winpositionkid/{ide}/{winPosition}")
-    public ResponseEntity<ResponseDTO> winPositionKid(@PathVariable String ide, @PathVariable int winPosition) throws ListSEException{
+    @GetMapping(path = "/winpositionkid/{ide}/{win}")
+    public ResponseEntity<ResponseDTO> winPositionKid(@PathVariable String ide, @PathVariable int win) throws ListSEException{
         try {
-            if (listaSEService.getKids() != null) {
-                listaSEService.getKids().winPositionKid(ide, winPosition, listaSEService.getKids());
+                listaSEService.getKids().winPositionKid(ide, win, listaSEService.getKids());
                 return new ResponseEntity<>(new ResponseDTO(200, "El niño se ha movido con éxito", null), HttpStatus.OK);
-
-            } else {
-                return new ResponseEntity<>(new ResponseDTO(409, "No se puede realizar la acción", null), HttpStatus.BAD_REQUEST);
-            }
         } catch (Exception e) {
             return new ResponseEntity<>(new ResponseDTO(500, "Error interno del servidor", null), HttpStatus.INTERNAL_SERVER_ERROR);
         }
