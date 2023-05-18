@@ -5,12 +5,14 @@ import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 @Data
 public class ListDECircular {
     private NodeDE headCircular;
     private int size;
     List<Pet> pets = new ArrayList<>();
+
 
     //Method getPets
     public Pet[] getCircular() {
@@ -33,20 +35,22 @@ public class ListDECircular {
     public void addPetCircular(Pet pet) throws ListDEException{
         NodeDE newNode = new NodeDE(pet);
         if (headCircular == null){
+            newNode.setPreviousDE(newNode);
+            newNode.setNextDE(newNode);
             headCircular = newNode;
-            headCircular.setPreviousDE(headCircular);
-            headCircular.setNextDE(headCircular);
         }
-        if (size == 1){
+        if (size == 1) {
             headCircular.setPreviousDE(newNode);
             headCircular.setNextDE(newNode);
             newNode.setNextDE(headCircular);
             newNode.setPreviousDE(headCircular);
         }
-        if (size > 1){
-            newNode.setPreviousDE(headCircular.getPreviousDE());
+        NodeDE beforeNode = headCircular.getPreviousDE();
+        if (size > 1) {
             headCircular.setPreviousDE(newNode);
             newNode.setNextDE(headCircular);
+            newNode.setPreviousDE(beforeNode);
+            beforeNode.setNextDE(newNode);
         }
         size++;
     }
@@ -60,115 +64,89 @@ public class ListDECircular {
             headCircular.setPreviousDE(headCircular);
             headCircular.setNextDE(headCircular);
         }
-        if (size > 0){
-            temp.setNextDE(newNode);
-            newNode.setPreviousDE(temp);
+        if (size == 1){
             headCircular.setPreviousDE(newNode);
+            newNode.setNextDE(headCircular);
+            headCircular.setNextDE(newNode);
+            newNode.setPreviousDE(headCircular);
+            headCircular = newNode;
+        }
+        if (size>1){
+            newNode.setPreviousDE(temp);
+            temp.setNextDE(newNode);
+            headCircular.setPreviousDE(newNode);
+            newNode.setNextDE(headCircular);
             headCircular = newNode;
         }
         size++;
     }
 
     //Method addPosition
-
-
     public void addPosition(Pet pet , int pos) throws ListDEException {
         NodeDE newNode = new NodeDE(pet);
         NodeDE temp = headCircular;
-        while (size != 0) {
-            if (pos <= size && pos > 0) {
-                if (pos == 1) {
-                    newNode.setPreviousDE(headCircular.getPreviousDE());
-                    headCircular.setPreviousDE(newNode);
-                    newNode.setNextDE(headCircular);
-                    headCircular = newNode;
-                }
-                if (pos > size) {
-                    newNode.setPreviousDE(headCircular.getPreviousDE());
-                    newNode.setNextDE(headCircular);
-                    headCircular.setPreviousDE(newNode);
-                } else {
-                    while (temp.getNextDE() != headCircular) {
-                        temp = temp.getNextDE();
-                    }
-                    newNode.setNextDE(temp.getNextDE());
-                    temp.setNextDE(newNode);
-                    newNode.setPreviousDE(temp);
-                }
-            } else {
-                addPetCircular(pet);
-            }
-            size++;
-        }
-    }
-
-/*
-    public void addPetPositionCircular(Pet pet, int position) throws ListDEException{
-        if (position == 1) {
-            addPetToStartCircular(pet);
-        }
-        NodeDE newNode = new NodeDE(pet);
-        if (position>size){
-            addPetCircular(newNode.getData());
+        int i = 0;
+        if (headCircular == null){
+            addPetCircular(pet);
         }else {
-            NodeDE temp = headCircular;
-            for (int i = 0; i < position; i++) {
-                temp = temp.getNextDE();
+            if (pos == 1) {
+                addPetToStartCircular(pet);
+            } else {
+                if (pos > size) {
+                    addPetCircular(pet);
+                } else {
+                    if ((pos > 1) && (pos < size)) {
+                        while (i < pos) {
+                            temp = temp.getNextDE();
+                            i++;
+                        }
+                        newNode.setNextDE(temp.getNextDE());
+                        newNode.setPreviousDE(temp);
+                        temp.setNextDE(newNode);
+                    }
+                }
             }
-            newNode.setNextDE(temp.getNextDE());
-            temp.setNextDE(newNode);
-            newNode.setPreviousDE(temp);
         }
         size++;
-    }*/
+    }
 
     //Method takeAShower
-    /*
-    public int takeShower(char letter) {
-        char start = Character.toLowerCase(letter);
-        NodeDE temp = head;
+    public Pet takePetShower(char letter) throws ListDEException{
+        char direction = Character.toUpperCase(letter);
+        NodeDE temp = headCircular;
 
-        if (temp == null) {
-            // No hay perros para bañar
-            return 0;
+        Random random = new Random();
+        int num_random = random.nextInt(size+1);
+        int cont = 0;
+
+        if (headCircular == null){
+            throw new ListDEException("La lista esta vacia, no se puede realizar la accion");
         }
 
-        if (start != 'd' && start != 'i') {
-            // Debe ingresar 'd' (derecha) o 'i' (izquierda)
-            return 0;
-        }
-
-        Random rand = new Random();
-        int num = rand.nextInt(size) + 1;
-        if (num == 1) {
-            if (temp.getData().isDirty()) {
-                temp.getData().setDirty(false);
-            } else {
-                // La mascota ya está bañada
-                return 0;
+        if (direction=='R'){
+            while (cont != num_random){
+                temp = temp.getNextDE();
+                cont++;
             }
-        } else {
-            int count = 1;
-            if (start == 'd') {
-                while (count != num) {
-                    temp = temp.getNext();
-                    count++;
-                }
-            } else {
-                while (count != num) {
-                    temp = temp.getPrev();
-                    count++;
-                }
+            if (!temp.getData().isBathed()){
+                temp.getData().setBathed(true);
+                return temp.getData();
+            }else {
+                throw new ListDEException("La mascota "+temp.getData().getName()+" identificada con el numero: "
+                            + temp.getData().getIdentification() +" ya esta bañada");
             }
-
-            if (temp.getData().isDirty()) {
-                temp.getData().setDirty(false);
-            } else {
-                // La mascota ya está bañada
-                return 0;
+        }else {
+            while (cont != num_random){
+                temp = temp.getPreviousDE();
+                cont++;
+            }
+            if (!temp.getData().isBathed()){
+                temp.getData().setBathed(true);
+                return temp.getData();
+            }else {
+                throw new ListDEException("La mascota "+temp.getData().getName()+" identificada con el numero: "
+                        + temp.getData().getIdentification() +" ya esta bañada");
             }
         }
-
-        return num;
-    }*/
+    }
 } //  end class_ListDECircular
