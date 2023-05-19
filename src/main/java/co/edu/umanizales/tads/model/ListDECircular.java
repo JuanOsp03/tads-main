@@ -117,7 +117,7 @@ public class ListDECircular {
 
         Random random = new Random();
         int num_random = random.nextInt(size+1);
-        int cont = 0;
+        int cont = 1;
 
         if (headCircular == null){
             throw new ListDEException("La lista esta vacia, no se puede realizar la accion");

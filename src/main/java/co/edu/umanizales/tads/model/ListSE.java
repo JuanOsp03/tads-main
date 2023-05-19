@@ -9,7 +9,6 @@ public class ListSE {
     private Node head;
     private int size;
 
-
     public void add(Kid kid) throws ListSEException {
         if (head != null) {
             Node temp = head;
@@ -92,11 +91,17 @@ public class ListSE {
         }
     }
 
-    public void alternateKids() throws ListSEException {
+    //---- Sustentación Final ---
+    public void alternateTwoBoysAndTwoGirls() throws ListSEException {
         ListSE alternateList = new ListSE();
 
         ListSE listBoys = new ListSE();
         ListSE listGirls = new ListSE();
+
+        int countBoys = 0;
+        int countGirls = 0;
+
+        int totalKids;
 
         Node temp = head;
 
@@ -106,26 +111,93 @@ public class ListSE {
             while (temp != null) {
                 if (temp.getData().getGender() == 'M') {
                     listBoys.add(temp.getData());
+                    countBoys++;
                 } else {
                     if (temp.getData().getGender() == 'F') {
                         listGirls.add(temp.getData());
+                        countGirls++;
                     }
                 }
                 temp = temp.getNext();
             }
 
+            totalKids = countGirls + countBoys;
             Node boysNode = listBoys.getHead();
             Node girlsNode = listGirls.getHead();
 
-            while (boysNode != null) {
+            while (totalKids!=0){
                 if (boysNode != null) {
                     alternateList.add(boysNode.getData());
                     boysNode = boysNode.getNext();
+                    countBoys--;
+                }
+                if (boysNode != null) {
+                    alternateList.add(boysNode.getData());
+                    boysNode = boysNode.getNext();
+                    countBoys--;
                 }
                 if (girlsNode != null) {
                     alternateList.add(girlsNode.getData());
                     girlsNode = girlsNode.getNext();
+                    countGirls--;
                 }
+                if (girlsNode != null) {
+                    alternateList.add(girlsNode.getData());
+                    girlsNode = girlsNode.getNext();
+                    countGirls--;
+                }
+                totalKids = countGirls + countBoys;
+            }
+            this.head = alternateList.getHead();
+        }
+    }
+//--- FIN SUSTENTACION ---
+
+    public void alternateKids() throws ListSEException {
+        ListSE alternateList = new ListSE();
+
+        ListSE listBoys = new ListSE();
+        ListSE listGirls = new ListSE();
+
+        int countBoys = 0;
+        int countGirls = 0;
+
+        int totalKids;
+
+        Node temp = head;
+
+        if (this.head == null && this.head.getNext() == null) {
+            throw new ListSEException("No existen niños o no hay suficientes para alternar");
+        } else {
+            while (temp != null) {
+                if (temp.getData().getGender() == 'M') {
+                    listBoys.add(temp.getData());
+                    countBoys++;
+                } else {
+                    if (temp.getData().getGender() == 'F') {
+                        listGirls.add(temp.getData());
+                        countGirls++;
+                    }
+                }
+                temp = temp.getNext();
+            }
+
+            totalKids = countGirls + countBoys;
+            Node boysNode = listBoys.getHead();
+            Node girlsNode = listGirls.getHead();
+
+            while (totalKids!=0){
+                if (boysNode != null) {
+                    alternateList.add(boysNode.getData());
+                    boysNode = boysNode.getNext();
+                    countBoys--;
+                }
+                if (girlsNode != null) {
+                    alternateList.add(girlsNode.getData());
+                    girlsNode = girlsNode.getNext();
+                    countGirls--;
+                }
+                totalKids = countGirls + countBoys;
             }
             this.head = alternateList.getHead();
         }
@@ -226,6 +298,12 @@ public class ListSE {
 
             int newPosition = count - position;
             Kid listCopy = temp.getData();
+
+            if (position > size){
+                listSE.deleteKidByIdentification(temp.getData().getIdentification());
+                listSE.addToStart(listCopy);
+            }
+
             listSE.deleteKidByIdentification(temp.getData().getIdentification());
             listSE.addKidsByPosition(listCopy, newPosition);
 
@@ -245,6 +323,12 @@ public class ListSE {
             }
             int newPosition = position + count;
             Kid listCopy = temp.getData();
+
+            if (position > size) {
+                listSE.deleteKidByIdentification(temp.getData().getIdentification());
+                listSE.add(listCopy);
+            }
+
             listSE.deleteKidByIdentification(temp.getData().getIdentification());
             listSE.addKidsByPosition(listCopy, newPosition);
 

@@ -106,6 +106,22 @@ public class ListSEController {
         }
     }
 
+    //---- sustentacion ---
+    @GetMapping(path = "/alternateTwoBoysTwoGirls")
+    public ResponseEntity<ResponseDTO> generateAlternate() throws ListSEException {
+        try {
+            if (listaSEService.getKids() != null) {
+                listaSEService.getKids().alternateTwoBoysAndTwoGirls();
+                return new ResponseEntity<>(new ResponseDTO(200, "Se ha alternado la lista", null), HttpStatus.OK);
+
+            } else {
+                return new ResponseEntity<>(new ResponseDTO(409, "No se puede realizar la acción", null), HttpStatus.BAD_REQUEST);
+            }
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseDTO(500, "Error interno del servidor", null), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @GetMapping(path = "/deletekidbyage/{age}")
     public ResponseEntity<ResponseDTO> deleteKidByAge(@PathVariable byte age) throws ListSEException{
         try {
