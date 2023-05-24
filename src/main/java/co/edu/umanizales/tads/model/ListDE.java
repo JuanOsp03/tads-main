@@ -357,29 +357,28 @@ una vez parado en el nodo que deseo eliminar, tengo que realizar nuevas validaci
  elimino las conexiones que tiene el siguiente y el previous del nodo que voy a eliminar, actualizar las conexiones de los nodo vecinos
 
  */
-    public void deleteSpecificNodeDE(String identification){
+    public void deleteSpecificNodeDE(String identification) {
         NodeDE temp = headDE;
-        NodeDE before , after;
-        if(this.headDE != null) {
-            if (this.headDE.getData().getIdentification().equals(identification)) {
-                this.headDE = headDE.getNextDE();
+        if (headDE != null) {
+            if (temp.getData().getIdentification().equals(identification)) {
+                this.headDE = temp.getNextDE();
                 if (headDE != null) {
                     headDE.setPreviousDE(null);
+                    size--;
+                    return;
                 }
-            } else {
-                while (!temp.getData().getIdentification().equals(identification)) {
-                    temp = temp.getNextDE();
+            }
+
+            while (temp != null) {
+                if (temp.getData().getIdentification().equals(identification)) {
+                    temp.getPreviousDE().setNextDE(temp.getNextDE());
+
+                    if (temp.getNextDE() != null) {
+                        temp.getNextDE().setPreviousDE(temp.getPreviousDE());
+                    }
+                    size--;
                 }
                 temp = temp.getNextDE();
-                if(temp.getNextDE() == null) {
-                    before = temp.getPreviousDE();
-                    before.setNextDE(null);
-                } else {
-                    before = temp.getPreviousDE();
-                    after = temp.getNextDE();
-                    before.setNextDE(after);
-                    after.setPreviousDE(before);
-                }
             }
         }
     }

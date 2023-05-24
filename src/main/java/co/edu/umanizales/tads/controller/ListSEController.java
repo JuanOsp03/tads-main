@@ -108,7 +108,7 @@ public class ListSEController {
 
     //---- sustentacion ---
     @GetMapping(path = "/alternateTwoBoysTwoGirls")
-    public ResponseEntity<ResponseDTO> generateAlternate() throws ListSEException {
+    public ResponseEntity<ResponseDTO> generateAlternateTwoBoysAndTwoGirls() throws ListSEException {
         try {
             if (listaSEService.getKids() != null) {
                 listaSEService.getKids().alternateTwoBoysAndTwoGirls();
@@ -121,7 +121,7 @@ public class ListSEController {
             return new ResponseEntity<>(new ResponseDTO(500, "Error interno del servidor", null), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
+//--- fin sustentacion ---
     @GetMapping(path = "/deletekidbyage/{age}")
     public ResponseEntity<ResponseDTO> deleteKidByAge(@PathVariable byte age) throws ListSEException{
         try {

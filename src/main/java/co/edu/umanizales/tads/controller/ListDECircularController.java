@@ -67,12 +67,16 @@ public class ListDECircularController {
     @GetMapping(path = "/take_a_shower/{direction}")
     public ResponseEntity<ResponseDTO> takePetAShower(@PathVariable char direction) throws ListDEException{
         char letterUpperCase = Character.toUpperCase(direction);
+        Pet pet = listDECircularService.getPetsCircular().takePetShower(direction);
         if (listDECircularService.getPetsCircular()!=null) {
             if ((letterUpperCase != 'R') && (letterUpperCase != 'L')) {
                 return new ResponseEntity<>(new ResponseDTO(200, "La direccion no esta bien definida; debe de ser 'r' para derecha y 'l' para izquierda", null), HttpStatus.OK);
             } else {
-                listDECircularService.getPetsCircular().takePetShower(direction);
-                return new ResponseEntity<>(new ResponseDTO(200, "La mascota ha sido bañada", null), HttpStatus.OK);
+                if (pet == null) {
+                    return new ResponseEntity<>(new ResponseDTO(200, "La mascota ha sido bañada", null), HttpStatus.OK);
+                }else{
+                    return new ResponseEntity<>(new ResponseDTO(500, "La mascota ya esta bañada", null), HttpStatus.BAD_REQUEST);
+                }
             }
         }else {
             return new ResponseEntity<>(new ResponseDTO(409,"La lista esta vacia, no se puede hacer la operación",null),HttpStatus.OK);
